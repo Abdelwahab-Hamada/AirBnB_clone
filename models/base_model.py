@@ -4,6 +4,7 @@ from uuid import uuid4
 from datetime import datetime
 import models
 
+
 class BaseModel:
     """BaseModel props"""
     def __init__(self, *args, **kwargs):
@@ -13,7 +14,7 @@ class BaseModel:
         self.updated_at = datetime.today()
         if kwargs:
             datetime_form = "%Y-%m-%dT%H:%M:%S.%f"
-            for k, v in kwargs.items():#k:key, v:value
+            for k, v in kwargs.items():  # k:key, v:value
                 if k == "created_at" or k == "updated_at":
                     self.__dict__[k] = datetime.strptime(v, datetime_form)
                 else:
