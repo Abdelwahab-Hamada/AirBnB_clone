@@ -1,10 +1,16 @@
 #!/usr/bin/python3
-"""console"""
+"""Defines the HBnB console."""
 import cmd
 import re
 from shlex import split
 from models import storage
 from models.base_model import BaseModel
+from models.user import User
+from models.state import State
+from models.city import City
+from models.place import Place
+from models.amenity import Amenity
+from models.review import Review
 
 
 def parse(arg):
@@ -26,7 +32,11 @@ def parse(arg):
 
 
 class HBNBCommand(cmd.Cmd):
-    """HBNBCommand props"""
+    """Defines the HolbertonBnB command interpreter.
+    Attributes:
+        prompt (str): The command prompt.
+    """
+
     prompt = "(hbnb) "
     __classes = {
         "BaseModel",
@@ -37,6 +47,10 @@ class HBNBCommand(cmd.Cmd):
         "Amenity",
         "Review"
     }
+
+    def emptyline(self):
+        """Do nothing upon receiving an empty line."""
+        pass
 
     def default(self, arg):
         """Default behavior for cmd module when input is invalid"""
@@ -60,24 +74,20 @@ class HBNBCommand(cmd.Cmd):
         return False
 
     def do_quit(self, arg):
-        """quit: exit the program"""
+        """Quit command to exit the program."""
         return True
 
-    def do_EOF(self, arg=""):
-        """EOF"""
-        print(arg)
+    def do_EOF(self, arg):
+        """EOF signal to exit the program."""
+        print("")
         return True
-
-    def emptyline(self):
-        """empty line pass"""
-        pass
 
     def do_create(self, arg):
         """Usage: create <class>
-        Creates a new class instance and print its id
+        Create a new class instance and print its id.
         """
         argl = parse(arg)
-        if not argl:
+        if len(argl) == 0:
             print("** class name missing **")
         elif argl[0] not in HBNBCommand.__classes:
             print("** class doesn't exist **")
@@ -87,7 +97,7 @@ class HBNBCommand(cmd.Cmd):
 
     def do_show(self, arg):
         """Usage: show <class> <id> or <class>.show(<id>)
-        Display the string representation of a class instance of a given id
+        Display the string representation of a class instance of a given id.
         """
         argl = parse(arg)
         objdict = storage.all()
@@ -134,6 +144,16 @@ class HBNBCommand(cmd.Cmd):
                 elif len(argl) == 0:
                     objl.append(obj.__str__())
             print(objl)
+
+    def do_count(self, arg):
+        """Usage: count <class> or <class>.count()
+        Retrieve the number of instances of a given class."""
+        argl = parse(arg)
+        count = 0
+        for obj in storage.all().values():
+            if argl[0] == obj.__class__.__name__:
+                count += 1
+        print(count)
 
     def do_update(self, arg):
         """Usage: update <class> <id> <attribute_name> <attribute_value> or
