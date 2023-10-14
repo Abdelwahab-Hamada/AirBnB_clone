@@ -1,44 +1,64 @@
 #!/usr/bin/python3
-"""FileStorage"""
+"""
+Filestorage
+"""
 import json
-from models.base_model import BaseModel
 from models.user import User
 from models.state import State
 from models.city import City
-from models.place import Place
 from models.amenity import Amenity
+from models.place import Place
 from models.review import Review
 
 
 class FileStorage:
-    """FileStorage props"""
-    __file_path = "file.json"
+    """
+    Filestorage props
+    """
+    __file_path = 'file.json'
     __objects = {}
 
     def all(self):
-        """Return __objects"""
         return FileStorage.__objects
 
     def new(self, obj):
-        """Set __objects"""
-        obj_class_name = obj.__class__.__name__
-        FileStorage.__objects["{}.{}".format(obj_class_name, obj.id)] = obj
+        key = type(obj).__name__ + '.' + obj.id
+        FileStorage.__objects[key] = obj
 
     def save(self):
-        """Serialize objects to JSON and it save to file"""
-        objs_dict = FileStorage.__objects
-        data = {obj: objs_dict[obj].to_dict() for obj in objs_dict.keys()}
-        with open(FileStorage.__file_path, "w") as f:
-            json.dump(data, f)
+        """
+        serialize objects
+        """
+        with open(FileStorage.__file_path, 'w+') as f:
+            dictofobjs = {}
+            for key, value in FileStorage.__objects.items():
+                dictofobjs[key] = value.to_dict()
+            json.dump(dictofobjs, f)
 
     def reload(self):
-        """Deserialize file objects, if it exists"""
+        """
+        deserialize data from json file
+        """
         try:
-            with open(FileStorage.__file_path) as f:
-                data = json.load(f)
-                for obj in data.values():
-                    cls_name = obj["__class__"]
-                    del obj["__class__"]
-                    self.new(eval(cls_name)(**obj))
+            with open(FileStorage.__file_path, 'r') as f:
+                dictofobjs = json.loads(f.read())
+                from models.base_model import BaseModel
+                from models.user import User
+                for key, value in dictofobjs.items():
+                    if value['__class__'] == 'BaseModel':
+                        FileStorage.__objects[key] = BaseModel(**value)
+                    elif value['__class__'] == 'User':
+                        FileStorage.__objects[key] = User(**value)
+                    elif value['__class__'] == 'Place':
+                        FileStorage.__objects[key] = Place(**value)
+                    elif value['__class__'] == 'State':
+                        FileStorage.__objects[key] = State(**value)
+                    elif value['__class__'] == 'City':
+                        FileStorage.__objects[key] = City(**value)
+                    elif value['__class__'] == 'Amenity':
+                        FileStorage.__objects[key] = Amenity(**value)
+                    elif value['__class__'] == 'Review':
+                        FileStorage.__objects[key] = Review(**value)
+
         except FileNotFoundError:
-            return
+            pass
