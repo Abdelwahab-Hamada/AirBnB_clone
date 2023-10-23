@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""Defines the HBnB console."""
+"""HBnB console"""
 import cmd
 import re
 from shlex import split
@@ -32,9 +32,8 @@ def parse(arg):
 
 
 class HBNBCommand(cmd.Cmd):
-    """Defines the HolbertonBnB command interpreter.
-    Attributes:
-        prompt (str): The command prompt.
+    """
+    HBNBCommand props
     """
 
     prompt = "(hbnb) "
